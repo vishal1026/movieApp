@@ -3,7 +3,7 @@ from models import *
 
 def checkAdmin(function):
     def wrap(request, *args, **kwargs):
-        if request.session['user_type'] == 1 or request.session['user_type'] == 2:
+        if request.session['user_type'] == 1:
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied

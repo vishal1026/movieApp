@@ -6,15 +6,10 @@
       <div class="card-body">
           {% if invalidcredential %}
           <div class="alert alert-danger">
-              Invalid user_name or password.
+              Invalid username or password.
           </div>
         {% endif%}
-        {% if userRegisteredSuccessfully %}
-          <div class="alert alert-success">
-            <strong>Registered Successfully!</strong>  login to continue
-          </div>
-        {% endif%}
-        <form action="{% url 'admin_login' %}" method="POST">{% csrf_token %}
+        <form action="{% url 'login' %}" method="POST">{% csrf_token %}
           <div class="form-group">
             <label for="user_name">Username:</label>
             <input type="text" class="form-control form-control-sm" id="user_name" placeholder="Enter username" name="user_name" required>
@@ -24,7 +19,6 @@
             <input type="password" class="form-control form-control-sm" id="password" placeholder="Enter password" name="password" required>
           </div>
           <button type="submit" class="btn btn-primary btn-sm btn-block">Login</button>
-          <!-- <a class="float-right" href="/movieApp/register/">Create new account</a> -->
         </form>
       </div>
     </div>
