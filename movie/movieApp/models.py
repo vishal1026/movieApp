@@ -45,8 +45,8 @@ class Movie(Common_create):
 	movie_id  = models.AutoField(primary_key=True)
 	movie_name = models.CharField(max_length=100)
 	description = models.TextField(blank=True)
-	genre_id  = models.ManyToManyField(Genre)
-	artist_id = models.ManyToManyField(Artist)
+	genre  = models.ManyToManyField(Genre)
+	artist = models.ManyToManyField(Artist)
 
 	class Meta:
 		db_table = 'movie'

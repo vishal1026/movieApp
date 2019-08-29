@@ -76,18 +76,13 @@ def admin_profile(request):
             movie.save()
 
             for genre_id in genre_list:
-                genre = Genre.objects.get(genre_id=genre_id)
-                movie.genre.add(movie)
+                genre_obj = Genre.objects.get(genre_id=genre_id)
+                movie.genre.add(genre_obj)
 
             for artist_id in artist_list:
-                artist = Artist.objects.get(artist_id=artist_id)
-                movie.artist.add(artist)
+                artist_obj = Artist.objects.get(artist_id=artist_id)
+                movie.artist.add(artist_obj)
 
-            # if movie.is_valid():
-            #     pass
-            #     # movie.save()
-            else:
-                msg = movie.error
     return HttpResponseRedirect('/movieApp/admin_profile/')
 
 
