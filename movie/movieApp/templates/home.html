@@ -8,6 +8,7 @@
 			<button class="btn btn-outline-success my-2 my-sm-0" name="getMovie" type="submit">Search</button>
 		</form>
 	</nav>
+	{% if movies|length %}
 	{% for movie in movies %}
 	<div class="card h-25 mt-3 mx-auto">
 	<div class="card-header">
@@ -34,4 +35,7 @@
 	</div>
 </div>
 {% endfor %}
+{% else %}
+	<h1 class="text-center"> no record found </h1>
+{% endif %}
 {% endblock content %}
