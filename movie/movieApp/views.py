@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from rest_framework.decorators import *
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import logout
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from models import *
 from decorators import *
 from serializers import *
@@ -16,7 +17,7 @@ from datetime import datetime
 class login(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
     def get(self, request):
-        return Response(template_name='login.html')
+        return Response(template_name='login.html', status=status.HTTP_200_OK)
 
     def post(self, request):
         try:
@@ -28,22 +29,31 @@ class login(APIView):
             request.session['user_id'] = user.user_id
             user.last_login = datetime.now()
             user.save()
-            template = 'super_admin.html' if user.user_type==1 else 'admin.html'
         except  Movie_user.DoesNotExist:
-            return Response({'invalidCredential':True},template_name='login.html')
+            return Response({'invalidCredential':True},template_name='login.html' , status=status.HTTP_404_NOT_FOUND)
         # return Response(template_name=template)
         return HttpResponseRedirect('/movieApp/admin_profile/')
+
+class home(APIView):
+    renderer_classes = (TemplateHTMLRenderer,)
+    def get(self, request):
+        return Response(template_name='home.html', status=status.HTTP_200_OK,
+        data={
+            'movies' : MovieSerializer(Movie.objects.all(), many=True).data
+        })
+
+    def post(self, request):
+        if 'getMovie' in request.POST:
+            return Response(template_name='home.html', status=status.HTTP_200_OK,
+            data={
+                'movies' : MovieSerializer(Movie.objects.filter(movie_name__contains=request.POST['searchMovie']), many=True).data
+            })
 
 @api_view(['GET','POST'])
 @checkAdmin
 @renderer_classes((TemplateHTMLRenderer,))
 def admin_profile(request):
     if request.method == 'GET':
-		# data = {
-		# 	'movies' : Movie.objects.all().prefetch_related('genre', 'artist'),
-		# 	'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
-		# 	'genres' : GenreSerializer(Genre.objects.all(), many=True).data
-		# 	}
 		return render(request, 'admin/admin.html',
         {
 			'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
@@ -76,18 +86,13 @@ def admin_profile(request):
             movie.save()
 
             for genre_id in genre_list:
-                genre = Genre.objects.get(genre_id=genre_id)
-                movie.genre.add(movie)
+                genre_obj = Genre.objects.get(genre_id=genre_id)
+                movie.genre.add(genre_obj)
 
             for artist_id in artist_list:
-                artist = Artist.objects.get(artist_id=artist_id)
-                movie.artist.add(artist)
+                artist_obj = Artist.objects.get(artist_id=artist_id)
+                movie.artist.add(artist_obj)
 
-            # if movie.is_valid():
-            #     pass
-            #     # movie.save()
-            else:
-                msg = movie.error
     return HttpResponseRedirect('/movieApp/admin_profile/')
 
 

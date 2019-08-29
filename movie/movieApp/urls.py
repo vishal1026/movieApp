@@ -5,8 +5,8 @@ from .views import *
 
 # router = routers.DefaultRouter()
 # router.register(r'admin_profile/', admin_profile)
-
 urlpatterns = [
+    url(r'^$', home.as_view(), name='home'),
     url(r'^login/', login.as_view(), name='login'),
     url(r'^admin_profile/', admin_profile, name='admin_profile'),
     url(r'^add_admin/', add_admin, name='add_admin'),

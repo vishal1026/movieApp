@@ -7,8 +7,6 @@
 	</div>
 	<nav>
 		<div class="nav nav-tabs" id="nav-tab" role="tablist">
-			<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
-				aria-controls="nav-home" aria-selected="true">home</a>
 			<a class="nav-item nav-link" id="nav-addGenre-tab" data-toggle="tab" href="#nav-addGenre" role="tab"
 				aria-controls="nav-addGenre" aria-selected="false">Genre</a>
 			<a class="nav-item nav-link" id="nav-addArtist-tab" data-toggle="tab" href="#nav-addArtist" role="tab"
@@ -22,29 +20,7 @@
 			{% endif %}
 		</div>
 	</nav>
-	<!-- home div -->
 	<div class="tab-content" id="nav-tabContent">
-		<div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-			{% if movieList %}
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th scope="col">movie Id</th>
-						<th scope="col">Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for movie in movieList %}
-					<tr id="{{ movie.movie_id }}">
-						<td scope="row">{{ movie.movie_id }}</td>
-						<td>{{ movie.movie_name }}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			{% endif %}
-		</div>
-
 		<!-- Add genre div -->
 		<div class="tab-pane fade" id="nav-addGenre" role="tabpanel" aria-labelledby="nav-addGenre-tab">
 			<div class="mx-auto mt-5" style="width: 400px;">
