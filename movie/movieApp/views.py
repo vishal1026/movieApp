@@ -8,8 +8,7 @@ from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import logout
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.shortcuts import render
 from models import *
 from decorators import *
 from serializers import *
@@ -35,26 +34,26 @@ class login(APIView):
         # return Response(template_name=template)
         return HttpResponseRedirect('/movieApp/admin_profile/')
 
-
 class home(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
     def get(self, request):
-        # movie = MovieSerializer(Movie.objects.all(), many=True).data
-        # movie = MovieSerializer(Movie.related.all(), many=True).data
+        return Response(template_name='home.html', status=status.HTTP_200_OK,
+        data={
+            'movies' : MovieSerializer(Movie.objects.all(), many=True).data
+        })
 
-        return Response(template_name='home.html', status=status.HTTP_200_OK )
-
+    def post(self, request):
+        if 'getMovie' in request.POST:
+            return Response(template_name='home.html', status=status.HTTP_200_OK,
+            data={
+                'movies' : MovieSerializer(Movie.objects.filter(movie_name__contains=request.POST['searchMovie']), many=True).data
+            })
 
 @api_view(['GET','POST'])
 @checkAdmin
 @renderer_classes((TemplateHTMLRenderer,))
 def admin_profile(request):
     if request.method == 'GET':
-		# data = {
-		# 	'movies' : Movie.objects.all().prefetch_related('genre', 'artist'),
-		# 	'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
-		# 	'genres' : GenreSerializer(Genre.objects.all(), many=True).data
-		# 	}
 		return render(request, 'admin/admin.html',
         {
 			'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,

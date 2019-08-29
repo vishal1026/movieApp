@@ -22,6 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^movieApp/', include('movieApp.urls')),
+    url(r'^$', include('movieApp.urls')),
 ]
 # urlpatterns = urlpatterns + staticfiles_urlpatterns()
 # urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
