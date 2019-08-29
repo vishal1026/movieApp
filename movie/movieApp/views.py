@@ -5,38 +5,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.utils.crypto import get_random_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import logout
-from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
+from django.shortcuts import render, redirect
 from models import *
 from decorators import *
 from serializers import *
-from random import randint
 from datetime import datetime
-
-@api_view(['GET','POST'])
-@checkAdmin
-@renderer_classes((TemplateHTMLRenderer,))
-def admin_profile(request):
-    if request.method == 'GET':
-        template = { 1:'superAdmin/super_admin.html', 2:'admin/admin.html' }
-        return render(request,template[request.session['user_type']])
-    elif request.method == 'POST':
-        print request
-
-
-
-
-@api_view(['GET'])
-@checkAdmin
-@renderer_classes((TemplateHTMLRenderer,))
-def add_admin(request):
-    if request.method == 'GET':
-        template = { 1:'superAdmin/super_admin.html', 2:'admin/admin.html' }
-        return render(request,template[request.session['user_type']])
-    elif request.method == 'POST':
-        print request
 
 class login(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
@@ -50,6 +25,7 @@ class login(APIView):
             request.session['first_name'] = user.first_name
             request.session['user_type'] = user.user_type
             request.session['user_name'] = user.user_name
+            request.session['user_id'] = user.user_id
             user.last_login = datetime.now()
             user.save()
             template = 'super_admin.html' if user.user_type==1 else 'admin.html'
@@ -57,3 +33,61 @@ class login(APIView):
             return Response({'invalidCredential':True},template_name='login.html')
         # return Response(template_name=template)
         return HttpResponseRedirect('/movieApp/admin_profile/')
+
+@api_view(['GET','POST'])
+@checkAdmin
+@renderer_classes((TemplateHTMLRenderer,))
+def admin_profile(request):
+    if request.method == 'GET':
+		# data = {
+		# 	'movies' : Movie.objects.all().prefetch_related('genre', 'artist'),
+		# 	'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
+		# 	'genres' : GenreSerializer(Genre.objects.all(), many=True).data
+		# 	}
+		return render(request, 'admin/admin.html',{
+			'movies' : Movie.objects.all().prefetch_related('genre', 'artist'),
+			'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
+			'genres' : GenreSerializer(Genre.objects.all(), many=True).data
+			})
+
+    elif request.method == 'POST':
+        msg = {}
+        if 'addGenre' in request.POST:
+            genre = GenreSerializer(data = request.POST)
+            if genre.is_valid():
+                genre.save()
+            else:
+                msg = genre.error
+
+        if 'addArtist' in request.POST:
+            artist = ArtistSerializer(data = request.POST)
+            if artist.is_valid():
+                artist.save()
+            else:
+                msg = artist.error
+
+        if 'addMovie' in request.POST:
+            movie = MovieSerializer(data = request.POST)
+            if movie.is_valid():
+                pass
+                # movie.save()
+            else:
+                msg = movie.error
+    return HttpResponseRedirect('/movieApp/admin_profile/')
+
+
+@api_view(['POST'])
+@checkSuperAdmin
+@renderer_classes((TemplateHTMLRenderer,))
+def add_admin(request):
+    form_data = request.POST
+    user = Movie_userSerializer(data = request.POST )
+    if user.is_valid():
+        user.save()
+    else:
+        return render(request, 'admin/admin.html',user.error)
+    return render(request, 'admin/admin.html' )
+
+def logout_user(request):
+    logout(request)
+    return HttpResponseRedirect('/movieApp/')

@@ -48,7 +48,6 @@ class Movie(Common_create):
 	genre_id  = models.ManyToManyField(Genre)
 	artist_id = models.ManyToManyField(Artist)
 	release_date = models.DateField()
-	image = models.ImageField( upload_to='movieImage/', default='no_image.jpg' )
 
 	class Meta:
 		db_table = 'movie'

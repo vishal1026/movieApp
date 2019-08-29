@@ -11,3 +11,15 @@ def checkAdmin(function):
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__
     return wrap
+
+
+def checkSuperAdmin(function):
+    def wrap(request, *args, **kwargs):
+        print "In wrap",request
+        if request.session['user_type'] == 1:
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap

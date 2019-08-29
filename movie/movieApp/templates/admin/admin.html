@@ -3,19 +3,23 @@
 {% block content %}
 <div class="mx-auto mt-5">
 	<div class="float-right">
-			<a  href="/movieApp/logoutUser/" class="btn btn-link">Logout</a>
+		<a href="{% url 'logout_user' %}" class="btn btn-link">Logout</a>
 	</div>
 	<nav>
 		<div class="nav nav-tabs" id="nav-tab" role="tablist">
 			<a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
-                aria-controls="nav-home" aria-selected="true">home</a>
-            <a class="nav-item nav-link" id="nav-addGenre-tab" data-toggle="tab" href="#nav-addGenre" role="tab"
-                aria-controls="nav-addGenre" aria-selected="false">Genre</a>
+				aria-controls="nav-home" aria-selected="true">home</a>
+			<a class="nav-item nav-link" id="nav-addGenre-tab" data-toggle="tab" href="#nav-addGenre" role="tab"
+				aria-controls="nav-addGenre" aria-selected="false">Genre</a>
 			<a class="nav-item nav-link" id="nav-addArtist-tab" data-toggle="tab" href="#nav-addArtist" role="tab"
-                aria-controls="nav-addArtist" aria-selected="false">Artist</a>
-            <a class="nav-item nav-link" id="nav-addMovie-tab" data-toggle="tab" href="#nav-addMovie" role="tab"
-                aria-controls="nav-addMovie" aria-selected="false">Movie</a>
-            {% block userManagementTab %}{% endblock userManagementTab %}
+				aria-controls="nav-addArtist" aria-selected="false">Artist</a>
+			<a class="nav-item nav-link" id="nav-addMovie-tab" data-toggle="tab" href="#nav-addMovie" role="tab"
+				aria-controls="nav-addMovie" aria-selected="false">Movie</a>
+			<!-- {% block userManagementTab %}{% endblock userManagementTab %} -->
+			{% if request.session.user_type == 1 %}
+			<a class="nav-item nav-link" id="nav-addAdmin-tab" data-toggle="tab" href="#nav-addAdmin" role="tab"
+				aria-controls="nav-addAdmin" aria-selected="false">User Management</a>
+			{% endif %}
 		</div>
 	</nav>
 	<!-- home div -->
@@ -47,10 +51,11 @@
 				<div class="card bg-light text-dark">
 					<div class="card-body">
 						<form name="addGenre" action="{% url 'admin_profile' %}" method="POST">{% csrf_token %}
+							<input type="hidden" name="created_by" id="created_by" value="{{ request.session.user_id }}">
 							<div class="form-group">
-								<label for="genre_name">genre name:</label>
-								<input type="text" class="form-control" id="genre_name" placeholder="Enter genre name"
-									name="genre_name" required>
+								<label for="genre_type">genre name:</label>
+								<input type="text" class="form-control" id="genre_type" placeholder="Enter genre name" name="genre_type"
+									required>
 							</div>
 							<button type="submit" name="addGenre" class="btn btn-primary btn-block">Add Genre</button>
 						</form>
@@ -65,14 +70,15 @@
 				<div class="card bg-light text-dark">
 					<div class="card-body">
 						<form name="addArtist" action="{% url 'admin_profile' %}" method="POST">{% csrf_token %}
+							<input type="hidden" name="created_by" id="created_by" value="{{ request.session.user_id }}">
 							<div class="form-group">
 								<label for="first_name">First name:</label>
-								<input type="text" class="form-control" id="first_name" placeholder="Enter first name"
+								<input type="text" class="form-control" id="artist_first_name" placeholder="Enter first name"
 									name="first_name" required>
 							</div>
 							<div class="form-group">
 								<label for="last_name">Last name:</label>
-								<input type="text" class="form-control" id="last_name" placeholder="Enter last name"
+								<input type="text" class="form-control" id="artist_last_name" placeholder="Enter last name"
 									name="last_name" required>
 							</div>
 							<button type="submit" name="addArtist" class="btn btn-primary btn-block">Add Artist</button>
@@ -88,48 +94,74 @@
 				<div class="card bg-light text-dark">
 					<div class="card-body">
 						<form name="addMovie" action="{% url 'admin_profile' %}" method="POST">{% csrf_token %}
+							<input type="hidden" name="created_by" id="created_by" value="{{ request.session.user_id }}">
 							<div class="form-group">
 								<label for="Movie_name">Movie name:</label>
-								<input type="text" class="form-control" id="movie_name" placeholder="Enter movie name"
-									name="movie_name" required>
+								<input type="text" class="form-control" id="movie_name" placeholder="Enter movie name" name="movie_name"
+									required>
 							</div>
 							<div class="form-group">
 								<label for="description">Description:</label>
 								<textarea type="text" class="form-control" id="description" placeholder="description"
 									name="description"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="movieGenre">Genre</label>
-                                <select multiple class="form-control" id="movieGenre">
-                                  <option>1</option>
-                                  <option>2</option>
-                                  <option>3</option>
-                                  <option>4</option>
-                                  <option>5</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="movieArtist">Artist Worked</label>
-                                <select multiple class="form-control" id="movieArtist">
-                                  <option>1</option>
-                                  <option>2</option>
-                                  <option>3</option>
-                                  <option>4</option>
-                                  <option>5</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                    <label for="image">Example file input</label>
-                                    <input type="file"  id="image" accept=".svg, .png, .jpg, .jpeg" class="form-control-file">
-                                  </div>
-							<button type="submit"  name="addMovie" class="btn btn-primary btn-block">Add Movie</button>
+							</div>
+							<div class="form-group">
+								<label for="movieGenre">Genre</label>
+								<select multiple class="form-control" id="genre_id">
+									{% for genre in genres %}
+									<option value="{{ genre.genre_id }}"> {{ genre.genre_type }} </option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="movieArtist">Artist Worked</label>
+								<select multiple class="form-control" id="artist_id">
+									{% for artist in artists %}
+										<option value="{{ artist.artist_id }}"> {{ artist.first_name }} {{ artist.last_name }} </option>
+									{% endfor %}
+								</select>
+							</div>
+							<button type="submit" name="addMovie" class="btn btn-primary btn-block">Add Movie</button>
 						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-        <!-- Add admin div -->
-        {% block addAdmin %} {% endblock addAdmin %}
+		<!-- Add admin div -->
+		<!-- {% block addAdmin %} {% endblock addAdmin %} -->
+		<div class="tab-pane fade" id="nav-addAdmin" role="tabpanel" aria-labelledby="nav-addAdmin-tab">
+			<div class="mx-auto mt-5" style="width: 400px;">
+				<div class="card bg-light text-dark">
+					<div class="card-body">
+						<form name="addAdmin" action="{% url 'add_admin' %}" method="POST">{% csrf_token %}
+							<input type="hidden" value=2 id="user_type" name="user_type">
+							<div class="form-group">
+								<label for="first_name">First name:</label>
+								<input type="text" class="form-control" id="first_name" placeholder="Enter first name" name="first_name"
+									required>
+							</div>
+							<div class="form-group">
+								<label for="last_name">Last name:</label>
+								<input type="text" class="form-control" id="last_name" placeholder="Enter last name" name="last_name"
+									required>
+							</div>
+							<div class="form-group">
+								<label for="user_name">username:</label>
+								<input type="text" class="form-control" id="user_name" placeholder="Enter username" name="user_name"
+									required>
+							</div>
+							<div class="form-group">
+								<label for="password">Password:</label>
+								<input type="password" class="form-control" id="password" placeholder="Enter password" name="password"
+									required>
+							</div>
+							<button type="submit" name="addAdmin" class="btn btn-primary btn-block">Register
+								Admin</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock content %}
