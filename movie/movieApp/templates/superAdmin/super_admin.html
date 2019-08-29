@@ -1,0 +1,41 @@
+{% extends "../admin/admin.html" %}
+{% block title %} SuperAdmin {% endblock title %}
+
+{% block userManagementTab %}
+  {% if request.session.user_type == 1 %}
+  <a class="nav-item nav-link" id="nav-addAdmin-tab" data-toggle="tab" href="#nav-addAdmin" role="tab"
+      aria-controls="nav-addAdmin" aria-selected="false">User Management</a>
+  {% endif %}
+{% endblock userManagementTab %}
+
+{% block addAdmin %}
+<div class="tab-pane fade" id="nav-addAdmin" role="tabpanel" aria-labelledby="nav-addAdmin-tab">
+  <div class="mx-auto mt-5" style="width: 400px;">
+    <div class="card bg-light text-dark">
+      <div class="card-body">
+        <form name="addAdmin" action="{% url 'add_admin' %}" method="POST">{% csrf_token %}
+          <div class="form-group">
+            <label for="first_name">First name:</label>
+            <input type="text" class="form-control" id="first_name" placeholder="Enter first name" name="first_name"
+              required>
+          </div>
+          <div class="form-group">
+            <label for="last_name">Last name:</label>
+            <input type="text" class="form-control" id="last_name" placeholder="Enter last name" name="last_name" required>
+          </div>
+          <div class="form-group">
+            <label for="user_name">username:</label>
+            <input type="text" class="form-control" id="user_name" placeholder="Enter username" onblur="validateUser(event)" name="user_name" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" placeholder="Enter password" name="password"
+              required>
+          </div>
+            <button type="submit"  name="addAdmin" class="btn btn-primary btn-block">Register Admin</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock addAdmin %}

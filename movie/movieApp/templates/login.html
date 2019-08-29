@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %} Login {% endblock %}
+{% block title %} Login {% endblock title %}
 {% block content %}
   <div class="mx-auto mt-5"  style="width: 400px;">
     <div class="card bg-light text-dark">
       <div class="card-body">
-          {% if invalidcredential %}
+          {% if invalidCredential %}
           <div class="alert alert-danger">
               Invalid username or password.
           </div>
@@ -23,4 +23,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
+{% endblock content %}
