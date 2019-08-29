@@ -15,20 +15,15 @@ from serializers import *
 from random import randint
 from datetime import datetime
 
-# @api_view(['GET'])
-# @renderer_classes((TemplateHTMLRenderer,))
-# def admin_login(request):
-#     return Response(template_name='login.html')
-
-class admin_login(APIView):
-    renderer_classes = (TemplateHTMLRenderer,)
-    @checkAdmin
-    def get(self, request):
-        return Response(template_name='register.html')
-
-    @checkAdmin
-    def post(self, request):
-        return Response(template_name='register.html')
+@api_view(['GET'])
+@checkAdmin
+@renderer_classes((TemplateHTMLRenderer,))
+def admin_profile(request):
+    if request.method == 'GET':
+        template = { 1:'superAdmin/super_admin.html', 2:'admin/admin.html' }
+        return render(request,template[request.session['user_type']])
+    elif request.method == 'POST':
+        pass
 
 class login(APIView):
     renderer_classes = (TemplateHTMLRenderer,)
@@ -44,7 +39,8 @@ class login(APIView):
             request.session['user_name'] = user.user_name
             user.last_login = datetime.now()
             user.save()
-            template = 'super_admin.html' if user.user_type==1 else 'register.html'
+            template = 'super_admin.html' if user.user_type==1 else 'admin.html'
         except  Movie_user.DoesNotExist:
             return Response({'invalidcredential':True},template_name='login.html')
-        return Response(template_name=template)
+        # return Response(template_name=template)
+        return HttpResponseRedirect('/movieApp/admin_profile/')
