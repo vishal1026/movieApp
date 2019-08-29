@@ -44,11 +44,11 @@ def admin_profile(request):
 		# 	'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
 		# 	'genres' : GenreSerializer(Genre.objects.all(), many=True).data
 		# 	}
-		return render(request, 'admin/admin.html',{
-			'movies' : Movie.objects.all().prefetch_related('genre', 'artist'),
+		return render(request, 'admin/admin.html',
+        {
 			'artists' : ArtistSerializer(Artist.objects.all(), many=True).data,
 			'genres' : GenreSerializer(Genre.objects.all(), many=True).data
-			})
+        })
 
     elif request.method == 'POST':
         msg = {}
@@ -67,10 +67,25 @@ def admin_profile(request):
                 msg = artist.error
 
         if 'addMovie' in request.POST:
-            movie = MovieSerializer(data = request.POST)
-            if movie.is_valid():
-                pass
-                # movie.save()
+            artist_list = request.POST.getlist('artist_id',[])
+            genre_list = request.POST.getlist('artist_id',[])
+            movie = Movie()
+            movie.movie_name = request.POST['movie_name']
+            movie.description = request.POST['description']
+            movie.created_by_id = request.POST['created_by']
+            movie.save()
+
+            for genre_id in genre_list:
+                genre = Genre.objects.get(genre_id=genre_id)
+                movie.genre.add(movie)
+
+            for artist_id in artist_list:
+                artist = Artist.objects.get(artist_id=artist_id)
+                movie.artist.add(artist)
+
+            # if movie.is_valid():
+            #     pass
+            #     # movie.save()
             else:
                 msg = movie.error
     return HttpResponseRedirect('/movieApp/admin_profile/')

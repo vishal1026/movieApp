@@ -20,6 +20,8 @@ class ArtistSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
-        fields = '__all__'
+	genre_id  = GenreSerializer()
+	artist_id = ArtistSerializer()
+	class Meta:
+		model = Movie
+		fields = '__all__'

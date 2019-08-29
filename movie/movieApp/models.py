@@ -47,7 +47,6 @@ class Movie(Common_create):
 	description = models.TextField(blank=True)
 	genre_id  = models.ManyToManyField(Genre)
 	artist_id = models.ManyToManyField(Artist)
-	release_date = models.DateField()
 
 	class Meta:
 		db_table = 'movie'
